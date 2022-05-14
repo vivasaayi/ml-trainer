@@ -62,7 +62,7 @@ class SimpleConvnet():
         print("Test accuracy:", score[1])
 
     def save_model(self):
-        path = "model_results/mnist/simple_convnet"
+        path = "model_results/mnist.py/simple_convnet"
         print("Saving Model to {}".format(path))
         self.model.save(path)
 

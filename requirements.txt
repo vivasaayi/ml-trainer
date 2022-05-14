@@ -3,3 +3,4 @@ matplotlib
 click
 numpy
 kaggle
+pandas

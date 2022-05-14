@@ -2,17 +2,20 @@ from torchvision import datasets, models,transforms as T
 from torch.utils.data import DataLoader
 
 base_path = "/Users/rajanp/Downloads/rice/RiceDiseaseDataset"
+num_workers=32
+img_size=28
 
 transform = T.Compose(
     [
-        T.Resize(126),
-        T.CenterCrop(126),
+        T.Resize(img_size),
+        T.CenterCrop(img_size),
         T.ToTensor(),
         T.Normalize([0.485, 0.456, 0.406],
                              [0.229, 0.224, 0.225])
     ])
 
 def get_training_data_loder(batch_size):
+    kwargs = {}
     training_data = datasets.ImageFolder(base_path + '/train', transform=transform)
     # training_data = datasets.MNIST(
     #     root="data",
@@ -20,7 +23,7 @@ def get_training_data_loder(batch_size):
     #     download=True,
     #     transform=transform
     # )
-    train_dataloader = DataLoader(training_data, batch_size=batch_size, shuffle=True)
+    train_dataloader = DataLoader(training_data, batch_size=batch_size, shuffle=True, **kwargs)
     print(train_dataloader)
     # ds
     return train_dataloader
