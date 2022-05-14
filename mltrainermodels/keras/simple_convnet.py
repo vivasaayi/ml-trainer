@@ -19,6 +19,3 @@ class SimpleConvnet():
                 layers.Dense(params["num_classes"], activation="softmax"),
             ]
         )
-
-    def print_summary(self):
-        self.model.summary()
