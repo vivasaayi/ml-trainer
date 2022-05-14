@@ -1,8 +1,11 @@
-from mltrainermodels.keras.simple_convnet import SimpleConvnet
 from datasets.keras.base_keras_dataset import BaseKerasDataSet
 
+from mltrainermodels.keras.simple_convnet import SimpleConvnet
+from mltrainermodels.keras.cnn import CNN
+
 models_dictionary = {
-    "local.simple_convnet": SimpleConvnet
+    "local.simple_convnet": SimpleConvnet,
+    "local.cnn": CNN
 }
 
 class KerasMLTrainer():

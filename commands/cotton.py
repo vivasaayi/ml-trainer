@@ -8,12 +8,12 @@ from torchvision.transforms import ToTensor
 
 
 @click.group()
-def mnist():
+def cotton():
     pass
 
 @click.group()
 def train():
-    print('Training MNIST Dataset')
+    print('Training COTTON Dataset')
 
     pass
 
@@ -24,15 +24,6 @@ def keras_simple_convnet():
     ml_trainer.initialize()
     ml_trainer.train(128, 3)
     ml_trainer.save_model()
-
-@click.command()
-def keras_cnn():
-    mnist_dataset = MnistDataSet()
-    ml_trainer = KerasMLTrainer("local.cnn", mnist_dataset)
-    ml_trainer.initialize()
-    ml_trainer.train(128, 3)
-    ml_trainer.save_model()
-
 
 @click.command()
 def torch_simple_convnet():
@@ -57,8 +48,7 @@ def torch_simple_convnet():
     ml_trainer.save_model()
 
 
-train.add_command(keras_cnn)
 train.add_command(keras_simple_convnet)
 train.add_command(torch_simple_convnet)
 
-mnist.add_command(train)
+rice.add_command(train)
