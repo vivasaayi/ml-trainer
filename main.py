@@ -1,23 +1,8 @@
-# This is a sample Python script.
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+from datasets.keras.cotton_disease import CottonDiseaseDataSet
+from trainer.keras_trainer import KerasMLTrainer
 
-from cifar10 import load as cifar_loader
-from cifar10 import train as cifar_trainer
-
-from cotton_disease import load as cotton_disase_loder
-from cotton_disease import train as cotton_disase_trainer
-
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
-    # cifar_loader.load()
-    cotton_disase_trainer.train()
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+cotton_disease_dataset = CottonDiseaseDataSet()
+ml_trainer = KerasMLTrainer("local.cnn", cotton_disease_dataset)
+ml_trainer.train_using_dir(128, 3)
+ml_trainer.save_model()

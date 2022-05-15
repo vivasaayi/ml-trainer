@@ -2,7 +2,7 @@ import click
 
 from trainer.keras_trainer import KerasMLTrainer
 from trainer.pytorch_trainer import PyTorchMLTrainer
-from datasets.keras.mnist import MnistDataSet
+from datasets.keras.cotton_disease import CottonDiseaseDataSet
 from torchvision import datasets
 from torchvision.transforms import ToTensor
 
@@ -19,15 +19,21 @@ def train():
 
 @click.command()
 def keras_simple_convnet():
-    mnist_dataset = MnistDataSet()
-    ml_trainer = KerasMLTrainer("local.simple_convnet", mnist_dataset)
-    ml_trainer.initialize()
-    ml_trainer.train(128, 3)
+    cotton_disease_dataset = CottonDiseaseDataSet()
+    ml_trainer = KerasMLTrainer("local.simple_convnet", cotton_disease_dataset)
+    ml_trainer.train_using_dir(128, 3)
     ml_trainer.save_model()
 
 @click.command()
+def keras_cnn():
+    cotton_disease_dataset = CottonDiseaseDataSet()
+    ml_trainer = KerasMLTrainer("local.cnn", cotton_disease_dataset)
+    ml_trainer.train_using_dir(128, 3)
+    ml_trainer.save_model()
+
+
+@click.command()
 def torch_simple_convnet():
-    #mnist_dataset = PyTorchMLTrainer()
     training_data = datasets.MNIST(
         root="data",
         train=True,
@@ -49,6 +55,8 @@ def torch_simple_convnet():
 
 
 train.add_command(keras_simple_convnet)
+train.add_command(keras_cnn)
+
 train.add_command(torch_simple_convnet)
 
-rice.add_command(train)
+cotton.add_command(train)

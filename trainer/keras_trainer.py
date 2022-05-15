@@ -42,6 +42,11 @@ class KerasMLTrainer():
         self.test_images = self.dataset.test_images
         self.test_labels = self.dataset.test_labels
 
+    def train_using_dir(self, batch_size:int, epochs:int):
+        self.dataset.load_data()
+        self.model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['accuracy'])
+        self.model.fit(x=self.dataset.train_data, validation_data=self.dataset.test_data, epochs=50)
+
     def train(self, batch_size:int, epochs:int):
         print(f"Training Keras ML Model {self.model_name}")
         self.model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
