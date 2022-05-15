@@ -26,18 +26,18 @@ class KerasMLTrainer():
 
     def initialize(self):
         self.dataset.load_data()
-        self.x_train = self.dataset.x_train
-        self.y_train = self.dataset.y_train
-        self.x_test = self.dataset.x_test
-        self.y_test = self.dataset.y_test
+        self.train_images = self.dataset.train_images
+        self.train_labels = self.dataset.train_labels
+        self.test_images = self.dataset.test_images
+        self.test_labels = self.dataset.test_labels
 
     def train(self, batch_size:int, epochs:int):
         print(f"Training Keras ML Model {self.model_name}")
         self.model.compile(loss="categorical_crossentropy", optimizer="adam", metrics=["accuracy"])
-        self.model.fit(self.x_train, self.y_train, batch_size=batch_size, epochs=epochs, validation_split=0.1)
+        self.model.fit(self.train_images, self.train_labels, batch_size=batch_size, epochs=epochs, validation_split=0.1)
 
     def evaluate(self):
-        score = self.model.evaluate(self.x_test, self.y_test, verbose=0)
+        score = self.model.evaluate(self.test_images, self.test_labels, verbose=0)
         print("Test loss:", score[0])
         print("Test accuracy:", score[1])
 

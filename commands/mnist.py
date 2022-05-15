@@ -36,7 +36,6 @@ def keras_cnn():
 
 @click.command()
 def torch_simple_convnet():
-    #mnist_dataset = PyTorchMLTrainer()
     training_data = datasets.MNIST(
         root="data",
         train=True,

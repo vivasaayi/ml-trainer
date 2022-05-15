@@ -2,15 +2,15 @@ import numpy as np
 from tensorflow import keras
 from datasets.keras.base_keras_dataset import BaseKerasDataSet
 
-class MnistDataSet(BaseKerasDataSet):
+class Cifar10DataSet(BaseKerasDataSet):
     def __init__(self):
         super().__init__()
-        print("Initializing MNIST Dataset")
+        print("Initializing CIFAR10 Dataset")
         self.num_classes = 10
-        self.input_shape = (28, 28, 1)
+        self.input_shape = (32, 32, 3)
 
     def load_data(self):
-        (train_images, train_labels), (test_images, test_labels) = keras.datasets.mnist.load_data()
+        (train_images, train_labels), (test_images, test_labels) = keras.datasets.cifar10.load_data()
 
         # Scale images to the [0, 1] range
         train_images = train_images.astype("float32") / 255
