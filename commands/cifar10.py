@@ -45,14 +45,14 @@ def keras_ka_resnet50():
 
 @click.command()
 def torch_simple_convnet():
-    training_data = datasets.MNIST(
+    training_data = datasets.CIFAR10(
         root="data",
         train=True,
         download=True,
         transform=ToTensor()
     )
 
-    test_data = datasets.MNIST(
+    test_data = datasets.CIFAR10(
         root="data",
         train=False,
         download=True,
