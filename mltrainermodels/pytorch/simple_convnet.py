@@ -4,7 +4,7 @@ import torch.nn as nn
 class SimpleConvnet(nn.Module):
     def __init__(self):
         super(SimpleConvnet, self).__init__()
-        self.conv2d = nn.Conv2d(in_channels=1, out_channels=9, kernel_size=(5, 5))
+        self.conv2d = nn.Conv2d(in_channels=3, out_channels=9, kernel_size=(5, 5))
         self.flatten = nn.Flatten()
         self.linear1 = nn.Linear(5184, 10)
         self.linear3 = nn.Linear(2000, 10)

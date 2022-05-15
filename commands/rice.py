@@ -61,11 +61,6 @@ def torch_resnet18():
     ml_trainer.save_model()
 
 
-train.add_command(keras_cnn)
-train.add_command(keras_simple_convnet)
-
-train.add_command(keras_ka_resnet50)
-
 train.add_command(torch_simple_convnet)
 train.add_command(torch_resnet18)
 
