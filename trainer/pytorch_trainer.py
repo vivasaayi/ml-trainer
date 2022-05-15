@@ -1,11 +1,15 @@
 from mltrainermodels.pytorch.simple_convnet import SimpleConvnet
+from mltrainermodels.pytorch.torch_models.resnet import Resnet18
+
 from torchinfo import summary
 import torch
 from torch.utils.data import DataLoader
 import torch.nn as nn
 
 models_dictionary = {
-    "local.simple_convnet": SimpleConvnet
+    "local.simple_convnet": SimpleConvnet,
+
+    "torch_models.resnet18": Resnet18
 }
 
 class PyTorchMLTrainer():
