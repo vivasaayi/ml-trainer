@@ -33,6 +33,22 @@ def keras_cnn():
     ml_trainer.train(128, 3)
     ml_trainer.save_model()
 
+@click.command()
+def keras_tfm_resnet18():
+    mnist_dataset = MnistDataSet()
+    ml_trainer = KerasMLTrainer("tfm.resnet18", mnist_dataset)
+    ml_trainer.initialize()
+    ml_trainer.train(128, 3)
+    ml_trainer.save_model()
+
+@click.command()
+def keras_ka_resnet50():
+    mnist_dataset = MnistDataSet()
+    ml_trainer = KerasMLTrainer("keras_applications.resnet50", mnist_dataset)
+    ml_trainer.initialize()
+    ml_trainer.train(128, 3)
+    ml_trainer.save_model()
+
 
 @click.command()
 def torch_simple_convnet():
@@ -58,6 +74,12 @@ def torch_simple_convnet():
 
 train.add_command(keras_cnn)
 train.add_command(keras_simple_convnet)
+
+train.add_command(keras_ka_resnet50)
+
+train.add_command(keras_tfm_resnet18)
+
 train.add_command(torch_simple_convnet)
+
 
 mnist.add_command(train)

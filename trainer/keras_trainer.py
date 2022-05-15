@@ -1,11 +1,22 @@
+from tensorflow import keras
 from datasets.keras.base_keras_dataset import BaseKerasDataSet
 
 from mltrainermodels.keras.simple_convnet import SimpleConvnet
 from mltrainermodels.keras.cnn import CNN
 
+from mltrainermodels.keras.tf_model_garden.resnet import Resnet18
+
+from mltrainermodels.keras.keras_applications.resnet import Resnet50
+
 models_dictionary = {
     "local.simple_convnet": SimpleConvnet,
-    "local.cnn": CNN
+    "local.cnn": CNN,
+
+    # Models from Tensorflow Models library
+    "tfm.resnet18": Resnet18,
+
+    # Models from Keras Applications
+    "keras_applications.resnet50": Resnet50
 }
 
 class KerasMLTrainer():

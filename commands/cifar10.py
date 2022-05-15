@@ -35,6 +35,15 @@ def keras_cnn():
 
 
 @click.command()
+def keras_ka_resnet50():
+    cifar10_dataset = Cifar10DataSet()
+    ml_trainer = KerasMLTrainer("keras_applications.resnet50", cifar10_dataset)
+    ml_trainer.initialize()
+    ml_trainer.train(128, 3)
+    ml_trainer.save_model()
+
+
+@click.command()
 def torch_simple_convnet():
     training_data = datasets.MNIST(
         root="data",
@@ -58,6 +67,9 @@ def torch_simple_convnet():
 
 train.add_command(keras_cnn)
 train.add_command(keras_simple_convnet)
+
+train.add_command(keras_ka_resnet50)
+
 train.add_command(torch_simple_convnet)
 
 cifar10.add_command(train)

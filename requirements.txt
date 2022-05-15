@@ -4,3 +4,5 @@ click
 numpy
 kaggle
 pandas
+#tensorflow-addons
+#tf-models-official
