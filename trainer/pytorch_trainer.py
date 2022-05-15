@@ -13,31 +13,36 @@ models_dictionary = {
 }
 
 class PyTorchMLTrainer():
-    def __init__(self, model_name, training_data, test_data):
+    def __init__(self, model_name):
         self.model_name = model_name
         print(f"Initializing Keras ML Trainer {self.model_name}")
 
-        self.training_data = training_data
-        self.test_data = test_data
         self.model = models_dictionary[model_name]()
         self.model.initialize()
 
         if torch.cuda.is_available():
+            print("Moving Model to CUDA")
             self.model.cuda()
 
         print(f"Model Initialized {self.model_name}")
         summary(self.model)
 
-    def initialize(self):
+    def initialize_with_dataset(self, training_data, test_data, batch_size):
+        training_data_loader = DataLoader(training_data, batch_size=batch_size, shuffle=True)
+        test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=True)
+        self.initialize_with_data_loader(training_data_loader, test_dataloader)
+
+    def initialize_with_data_loader(self, training_data_loader, test_data_loader):
         self.learning_rate = 1e-1
-        self.batch_size = 64
+        self.batch_size = 32
         self.epochs = 200
 
-        self.train_dataloader = DataLoader(self.training_data, batch_size=self.batch_size, shuffle=True)
-        self.test_dataloader = DataLoader(self.test_data, batch_size=self.batch_size, shuffle=True)
+        self.train_dataloader = training_data_loader
+        self.test_dataloader = test_data_loader
 
         self.loss_fn = nn.CrossEntropyLoss()
         self.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.learning_rate)
+
 
     def train_loop(self):
         size = len(self.train_dataloader.dataset)
@@ -77,8 +82,11 @@ class PyTorchMLTrainer():
 
     def train(self):
         print(f"Training ML Model {self.model_name}")
-        self.train_loop()
-        self.test_loop()
+        for epoch in range(0,self.epochs):
+          print(f"Starting epoch {epoch}")
+          self.train_loop()
+          self.test_loop()
+          print(f"Completed epoch {epoch}")
 
     def save_model(self):
         print("Saving Model")
