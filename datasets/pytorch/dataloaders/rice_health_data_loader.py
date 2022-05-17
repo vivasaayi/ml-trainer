@@ -18,6 +18,17 @@ class RiceHealthDataLoader():
         )
         return transforms
 
+    def get_empty_transform(self):
+        transforms = T.Compose(
+            [
+                #T.Resize(299),
+                #T.CenterCrop(299),
+                T.ToTensor(),
+                #T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+            ]
+        )
+        return transforms
+
     def get_training_data_loder(self, batch_size, transform=None):
         if transform is None:
             transform = self.get_empty_transform()
