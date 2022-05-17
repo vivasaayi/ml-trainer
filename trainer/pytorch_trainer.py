@@ -5,7 +5,10 @@ from mltrainermodels.pytorch.torch_models.vgg import VGG11, VGG13, VGG16, VGG19
 from mltrainermodels.pytorch.torch_models.googlenet import GoogleNet
 from mltrainermodels.pytorch.torch_models.inception import InceptionV3
 from mltrainermodels.pytorch.torch_models.resnext import Resnext50, Resnext101
-
+from mltrainermodels.pytorch.torch_models.squeezenet import Squeezenet10, Squeezenet11
+from mltrainermodels.pytorch.torch_models.shufflenet import Shufflenet_v2_x1_5, Shufflenet_v2_x0_5, Shufflenet_v2_x1_0, \
+    Shufflenet_v2_x2_0
+from mltrainermodels.pytorch.torch_models.mnasnet import Mnasnet0_5, Mnasnet1_0, Mnasnet1_3, Mnasnet0_75
 
 from torchinfo import summary
 import torch
@@ -22,7 +25,6 @@ models_dictionary = {
     "torch_models.resnet101": Resnet101,
     "torch_models.resnet152": Resnet152,
 
-
     "torch_models.vgg11": VGG11,
     "torch_models.vgg13": VGG13,
     "torch_models.vgg16": VGG16,
@@ -34,7 +36,21 @@ models_dictionary = {
 
     "torch_models.resnext50": Resnext50,
     "torch_models.resnext101": Resnext101,
+
+    "torch_models.squeezenet10": Squeezenet10,
+    "torch_models.squeezenet11": Squeezenet11,
+
+    "torch_models.shufflenet_v2_x1_5": Shufflenet_v2_x1_5,
+    "torch_models.shufflenet_v2_x0_5": Shufflenet_v2_x0_5,
+    "torch_models.shufflenet_v2_x1_0": Shufflenet_v2_x1_0,
+    "torch_models.shufflenet_v2_x2_0": Shufflenet_v2_x2_0,
+
+    "torch_models.mnasnet0_5": Mnasnet0_5,
+    "torch_models.mnasnet1_0": Mnasnet1_0,
+    "torch_models.mnasnet1_3": Mnasnet1_3,
+    "torch_models.mnasnet0_75": Mnasnet0_75
 }
+
 
 class PyTorchMLTrainer():
     def __init__(self, model_name):
@@ -51,7 +67,7 @@ class PyTorchMLTrainer():
         print(f"Model Initialized {self.model_name}")
 
         self.use_logits_for_loss_function = False
-        if(self.model_name == "torch_models.googlenet" or self.model_name == "torch_models.inceptionv3"):
+        if (self.model_name == "torch_models.googlenet" or self.model_name == "torch_models.inceptionv3"):
             self.use_logits_for_loss_function = True
 
         # ToDO: FIX ME
@@ -72,7 +88,6 @@ class PyTorchMLTrainer():
 
         self.loss_fn = nn.CrossEntropyLoss()
         self.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.learning_rate)
-
 
     def train_loop(self):
         size = len(self.train_dataloader.dataset)
@@ -116,11 +131,11 @@ class PyTorchMLTrainer():
 
     def train(self):
         print(f"Training ML Model {self.model_name}")
-        for epoch in range(0,self.epochs):
-          print(f"Starting epoch {epoch}")
-          self.train_loop()
-          self.test_loop()
-          print(f"Completed epoch {epoch}")
+        for epoch in range(0, self.epochs):
+            print(f"Starting epoch {epoch}")
+            self.train_loop()
+            self.test_loop()
+            print(f"Completed epoch {epoch}")
 
     def save_model(self):
         print("Saving Model")
