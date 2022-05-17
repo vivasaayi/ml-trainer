@@ -8,7 +8,7 @@ from datasets.pytorch.dataloaders.rice_health_data_loader import RiceHealthDataL
 from datasets.pytorch.pre_packaged_datasets import datasets as prebuilt_datasets
 from datasets.pytorch.data_loaders import data_loaders as supported_data_loaders
 
-ml_trainer = PyTorchMLTrainer("local.simple_convnet")
+ml_trainer = PyTorchMLTrainer("local.cnn")
 
 data_loader_name = "COTTON_DISEASE"
 prebuilt_dataset_name = None

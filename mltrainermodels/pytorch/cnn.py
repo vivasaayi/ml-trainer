@@ -8,48 +8,49 @@ import torch.nn as nn
 
 class CNN(nn.Module):
     def __init__(self, params={}):
-        super(CNN, self).__init__()
-        self.conv1 = nn.Conv2d(in_channels=3, out_channels=9, kernel_size=(5, 5))
-        self.conv2 = nn.Conv2d(in_channels=9, out_channels=18, kernel_size=(5, 5))
-        self.max_pool_2d = nn.MaxPool2d((5, 5))
-        self.flatten = nn.Flatten()
-        self.dropout = nn.Dropout(.5)
-
         num_classes = 4
-        if(num_classes in params):
+        if (num_classes in params):
             num_classes = params["num_classes"]
 
-        self.linear1 = nn.Linear(288, 144)
-        self.linear2 = nn.Linear(144, num_classes)
+        super(CNN, self).__init__()
+        self.conv1 = nn.Conv2d(in_channels=3, out_channels=20, kernel_size=(5, 5))
+        self.maxpool1 = nn.MaxPool2d((5, 5))
+
+
+        self.conv2 = nn.Conv2d(in_channels=20, out_channels=40, kernel_size=(5, 5))
+        self.maxpool2 = nn.MaxPool2d((5, 5))
+
+        self.flatten = nn.Flatten()
+        self.linear1 = nn.Linear(640, 100)
+
+        self.linear2 = nn.Linear(100, num_classes)
 
     def initialize(self):
         return
 
     def forward(self, x):
         # Convolution 1
-        conv1_result = self.conv1(x)
-        relu1_result = nn.functional.relu(conv1_result)
+        x = self.conv1(x)
+        x = nn.functional.relu(x)
+        x = self.maxpool1(x)
 
-        # Maxpool 2d
-        max_pool_2d_result = self.max_pool_2d(relu1_result)
 
         # Convolution 2
-        conv2_result = self.conv2(max_pool_2d_result)
-        relu2_result = nn.functional.relu(conv2_result)
-
-        # Maxpool 2d
-        max_pool_2d_result = self.max_pool_2d(relu2_result)
+        x = self.conv2(x)
+        x = nn.functional.relu(x)
+        x = self.maxpool2(x)
 
         # Flatten
-        flatten_result = self.flatten(max_pool_2d_result)
+        x = self.flatten(x)
 
         # Linear 1
-        linear_result1 = nn.functional.relu(self.linear1(flatten_result))
+        x = self.linear1(x)
+        x = nn.functional.relu(x)
 
         # Linear 2
-        linear_result2 = nn.functional.relu(self.linear2(linear_result1))
+        x = self.linear2(x)
 
         # Softmax
-        result = nn.functional.log_softmax(linear_result2, dim=1)
+        result = nn.functional.log_softmax(x, dim=1)
         return result
 
