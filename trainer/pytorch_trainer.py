@@ -1,5 +1,5 @@
 from mltrainermodels.pytorch.simple_convnet import SimpleConvnet
-from mltrainermodels.pytorch.torch_models.resnet import Resnet18
+from mltrainermodels.pytorch.torch_models.resnet import Resnet18, Resnet34, Resnet50, Resnet101, Resnet152
 
 from torchinfo import summary
 import torch
@@ -9,7 +9,11 @@ import torch.nn as nn
 models_dictionary = {
     "local.simple_convnet": SimpleConvnet,
 
-    "torch_models.resnet18": Resnet18
+    "torch_models.resnet18": Resnet18,
+    "torch_models.resnet34": Resnet34,
+    "torch_models.resnet50": Resnet50,
+    "torch_models.resnet101": Resnet101,
+    "torch_models.resnet152": Resnet152
 }
 
 class PyTorchMLTrainer():
@@ -25,6 +29,8 @@ class PyTorchMLTrainer():
             self.model.cuda()
 
         print(f"Model Initialized {self.model_name}")
+
+        # ToDO: FIX ME
         summary(self.model)
 
     def initialize_with_dataset(self, training_data, test_data, batch_size):

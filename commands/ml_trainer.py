@@ -23,10 +23,10 @@ def list_torch_model_names():
         print(key)
 
 @click.command()
-@click.argument('model_name', default='torch_models.resnet18')
 @click.argument('batch_size', default=32)
 @click.argument('epoch', default=50)
 @click.argument('learning_rate', default=1e-3)
+@click.option('--model-name', default='local.simple_convnet')
 @click.option('--data-loader-name', default=None)
 @click.option('--dataset-path', default=None)
 @click.option('--prebuilt-dataset-name', default=None)
