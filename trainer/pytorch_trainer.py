@@ -9,6 +9,7 @@ from mltrainermodels.pytorch.torch_models.squeezenet import Squeezenet10, Squeez
 from mltrainermodels.pytorch.torch_models.shufflenet import Shufflenet_v2_x1_5, Shufflenet_v2_x0_5, Shufflenet_v2_x1_0, \
     Shufflenet_v2_x2_0
 from mltrainermodels.pytorch.torch_models.mnasnet import Mnasnet0_5, Mnasnet1_0, Mnasnet1_3, Mnasnet0_75
+from mltrainermodels.pytorch.torch_models.mobilenet import MobileNetV3Large, MobileNetV3Small
 
 from torchinfo import summary
 import torch
@@ -48,7 +49,10 @@ models_dictionary = {
     "torch_models.mnasnet0_5": Mnasnet0_5,
     "torch_models.mnasnet1_0": Mnasnet1_0,
     "torch_models.mnasnet1_3": Mnasnet1_3,
-    "torch_models.mnasnet0_75": Mnasnet0_75
+    "torch_models.mnasnet0_75": Mnasnet0_75,
+
+    "torch_models.mobilenetv3large": MobileNetV3Large,
+    "torch_models.mobilenetv3small": MobileNetV3Small,
 }
 
 
