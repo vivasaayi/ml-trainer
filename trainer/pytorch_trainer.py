@@ -136,7 +136,7 @@ class PyTorchMLTrainer():
 
                 if self.use_logits_for_loss_function:
                     test_loss += self.loss_fn(pred.logits, y).item()
-                    correct += (pred.argmax(1) == y).type(torch.float).sum().item()
+                    correct += (pred.logits.argmax(1) == y).type(torch.float).sum().item()
                 else:
                     test_loss += self.loss_fn(pred, y).item()
                     correct += (pred.argmax(1) == y).type(torch.float).sum().item()
