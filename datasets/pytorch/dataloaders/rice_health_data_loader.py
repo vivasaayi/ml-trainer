@@ -8,8 +8,8 @@ class RiceHealthDataLoader():
     def get_transforms(self):
         transforms = T.Compose(
             [
-                T.Resize(128),
-                T.CenterCrop(128),
+                T.Resize(256),
+                T.CenterCrop(256),
                 T.ToTensor(),
                 T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
             ]

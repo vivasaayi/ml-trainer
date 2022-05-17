@@ -21,9 +21,9 @@ class CNN(nn.Module):
         self.maxpool2 = nn.MaxPool2d((5, 5))
 
         self.flatten = nn.Flatten()
-        self.linear1 = nn.Linear(640, 100)
+        self.linear1 = nn.Linear(3240, 324)
 
-        self.linear2 = nn.Linear(100, num_classes)
+        self.linear2 = nn.Linear(324, num_classes)
 
     def initialize(self):
         return
