@@ -1,4 +1,5 @@
 from mltrainermodels.pytorch.simple_convnet import SimpleConvnet
+from mltrainermodels.pytorch.cnn import CNN
 from mltrainermodels.pytorch.torch_models.resnet import Resnet18, Resnet34, Resnet50, Resnet101, Resnet152
 
 from torchinfo import summary
@@ -8,6 +9,7 @@ import torch.nn as nn
 
 models_dictionary = {
     "local.simple_convnet": SimpleConvnet,
+    "local.cnn": CNN,
 
     "torch_models.resnet18": Resnet18,
     "torch_models.resnet34": Resnet34,
