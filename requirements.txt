@@ -4,5 +4,6 @@ click
 numpy
 kaggle
 pandas
+torchinfo
 #tensorflow-addons
 #tf-models-official

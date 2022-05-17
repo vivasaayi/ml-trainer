@@ -37,6 +37,9 @@ class CottonDiseaseDataLoader():
         return train_dataloader
 
     def get_test_data_loader(self, batch_size, transform=None):
+        if transform is None:
+            transform = self.get_empty_transform()
+
         test_data = datasets.ImageFolder(self.base_path + '/validation', transform=transform)
         test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=True)
         return test_dataloader
