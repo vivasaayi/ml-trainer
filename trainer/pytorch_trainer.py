@@ -11,6 +11,8 @@ from mltrainermodels.pytorch.torch_models.shufflenet import Shufflenet_v2_x1_5, 
 from mltrainermodels.pytorch.torch_models.mnasnet import Mnasnet0_5, Mnasnet1_0, Mnasnet1_3, Mnasnet0_75
 from mltrainermodels.pytorch.torch_models.mobilenet import MobileNetV3Large, MobileNetV3Small
 
+from mltrainermodels.pytorch.torch_models.regnet import Regnet_x_8gf, Regnet_x_16gf, Regnet_y_8gf, Regnet_y_16gf
+
 from torchinfo import summary
 import torch
 from torch.utils.data import DataLoader
@@ -53,6 +55,11 @@ models_dictionary = {
 
     "torch_models.mobilenetv3large": MobileNetV3Large,
     "torch_models.mobilenetv3small": MobileNetV3Small,
+
+    "torch_models.regnet_x_8gf": Regnet_x_8gf,
+    "torch_models.regnet_x_16gf": Regnet_x_16gf,
+    "torch_models.regnet_y_8gf": Regnet_y_8gf,
+    "torch_models.regnet_y_16gf": Regnet_y_16gf
 }
 
 
