@@ -1,6 +1,11 @@
 from mltrainermodels.pytorch.simple_convnet import SimpleConvnet
 from mltrainermodels.pytorch.cnn import CNN
 from mltrainermodels.pytorch.torch_models.resnet import Resnet18, Resnet34, Resnet50, Resnet101, Resnet152
+from mltrainermodels.pytorch.torch_models.vgg import VGG11, VGG13, VGG16, VGG19
+from mltrainermodels.pytorch.torch_models.googlenet import GoogleNet
+from mltrainermodels.pytorch.torch_models.inception import InceptionV3
+from mltrainermodels.pytorch.torch_models.resnext import Resnext50, Resnext101
+
 
 from torchinfo import summary
 import torch
@@ -15,7 +20,20 @@ models_dictionary = {
     "torch_models.resnet34": Resnet34,
     "torch_models.resnet50": Resnet50,
     "torch_models.resnet101": Resnet101,
-    "torch_models.resnet152": Resnet152
+    "torch_models.resnet152": Resnet152,
+
+
+    "torch_models.vgg11": VGG11,
+    "torch_models.vgg13": VGG13,
+    "torch_models.vgg16": VGG16,
+    "torch_models.vgg19": VGG19,
+
+    "torch_models.googlenet": GoogleNet,
+
+    "torch_models.inceptionv3": InceptionV3,
+
+    "torch_models.resnext50": Resnext50,
+    "torch_models.resnext101": Resnext101,
 }
 
 class PyTorchMLTrainer():
@@ -31,6 +49,10 @@ class PyTorchMLTrainer():
             self.model.cuda()
 
         print(f"Model Initialized {self.model_name}")
+
+        self.use_logits_for_loss_function = False
+        if(self.model_name == "torch_models.googlenet" or self.model_name == "torch_models.inceptionv3"):
+            self.use_logits_for_loss_function = True
 
         # ToDO: FIX ME
         summary(self.model)
@@ -60,7 +82,11 @@ class PyTorchMLTrainer():
                 X = X.cuda()
                 y = y.cuda()
             pred = self.model(X)
-            loss = self.loss_fn(pred, y)
+
+            if not self.use_logits_for_loss_function:
+                loss = self.loss_fn(pred, y)
+            else:
+                loss = self.loss_fn(pred.logits, y)
 
             # Backpropagation
             self.optimizer.zero_grad()
