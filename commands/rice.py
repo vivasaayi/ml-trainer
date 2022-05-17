@@ -14,10 +14,27 @@ def rice():
     pass
 
 @click.group()
+def preprocess():
+    print('Preprocessing COTTON Dataset')
+
+    pass
+
+@click.group()
 def train():
     print('Training RICE Dataset')
 
     pass
+
+@click.command()
+def prepare_dataset():
+    print("Preparing DataSet")
+
+    base_path = "/users/rajanp/Downloads/rice/RiceDiseaseDataSet"
+    op_train_path = "/users/rajanp/Downloads/rice-processed/train"
+    op_test_path = "/users/rajanp/Downloads/rice-processed/validation"
+
+    dataloader = RiceHealthDataLoader(base_path)
+    dataloader.preprocess(op_train_path, op_test_path)
 
 @click.command()
 def torch_resnet18():
@@ -48,3 +65,6 @@ train.add_command(torch_resnet18)
 train.add_command(torch_resnet34)
 
 rice.add_command(train)
+
+preprocess.add_command(prepare_dataset)
+rice.add_command(preprocess)

@@ -109,10 +109,10 @@ class PyTorchMLTrainer():
                 y = y.cuda()
             pred = self.model(X)
 
-            if not self.use_logits_for_loss_function:
-                loss = self.loss_fn(pred, y)
-            else:
+            if self.use_logits_for_loss_function:
                 loss = self.loss_fn(pred.logits, y)
+            else:
+                loss = self.loss_fn(pred, y)
 
             # Backpropagation
             self.optimizer.zero_grad()
