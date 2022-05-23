@@ -46,5 +46,22 @@ def train_torch_net(model_name, batch_size, epoch, learning_rate, data_loader_na
     ml_trainer.train()
     ml_trainer.save_model()
 
+@click.command()
+@click.option('--data-loader-name', default=None)
+@click.option('--dataset-path', default=None)
+def prepare_dataset(data_loader_name, dataset_path):
+    print("Preparing DataSet")
+
+    op_train_path = f"{dataset_path}-processed/train"
+    op_test_path = f"{dataset_path}-processed/validation"
+
+    print(op_train_path)
+    print(op_test_path)
+
+    data_loader = supported_data_loaders[data_loader_name](dataset_path)
+    data_loader.preprocess(op_train_path, op_test_path)
+
+
 mltrainer.add_command(list_torch_model_names)
 mltrainer.add_command(train_torch_net)
+mltrainer.add_command(prepare_dataset)

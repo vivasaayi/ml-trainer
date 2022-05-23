@@ -8,7 +8,7 @@ import torch.nn as nn
 
 class CNN(nn.Module):
     def __init__(self, params={}):
-        num_classes = 4
+        num_classes = 12
         if (num_classes in params):
             num_classes = params["num_classes"]
 
