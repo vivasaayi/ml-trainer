@@ -5,5 +5,7 @@ numpy
 kaggle
 pandas
 torchinfo
+psycopg2
+boto3
 #tensorflow-addons
 #tf-models-official

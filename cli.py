@@ -4,6 +4,7 @@ from commands.cifar10 import cifar10
 from commands.mnist import mnist
 from commands.rice import rice
 from commands.cotton import cotton
+from commands.cotton_plants import cottonplants
 from commands.ml_trainer import mltrainer
 
 @click.group()
@@ -14,6 +15,7 @@ cli.add_command(cifar10)
 cli.add_command(mnist)
 cli.add_command(rice)
 cli.add_command(cotton)
+cli.add_command(cottonplants)
 cli.add_command(mltrainer)
 
 if __name__ == '__main__':
