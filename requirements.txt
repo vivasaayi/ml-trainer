@@ -7,5 +7,6 @@ pandas
 torchinfo
 psycopg2
 boto3
+seaborn
 #tensorflow-addons
 #tf-models-official

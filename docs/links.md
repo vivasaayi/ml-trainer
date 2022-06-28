@@ -40,7 +40,28 @@ git clone https://github.com/vivasaayi/ml-trainer.git
 cd ml-trainer
 pip install -r requirements.txt
 
-cp drive/MyDrive/datasets/cotton-disease-processed.zip sample_data/
+cd /content/sample_data
+rm extracted_datasets_local-processed.zip
+rm -rf extracted_datasets_local-processed
+
+cd /content
+cp drive/MyDrive/datasets/extracted_datasets_local-processed.zip sample_data/
 cd sample_data/
-unzip cotton-disease-processed.zip
+unzip extracted_datasets_local-processed.zip
+
+cd /content/ml-trainer && python cli.py mltrainer train-torch-net  --model-name=torch_models.inceptionv3 --data-loader-name COTTON_PLANTS --dataset-path=/content/sample_data/extracted_datasets_local-processed
+```
+
+
+```shell
+cd ~/SageMaker
+git clone https://github.com/vivasaayi/ml-trainer.git
+cd ml-trainer
+pip install -r requirements.txt
+
+cd ~/SageMaker
+rm -rf extracted_datasets_local-processed
+unzip extracted_datasets_local-processed.zip
+
+python cli.py mltrainer train-torch-net  --model-name=torch_models.inceptionv3 --data-loader-name COTTON_PLANTS --dataset-path=/home/ec2-user/SageMaker/extracted_datasets_local-processed
 ```

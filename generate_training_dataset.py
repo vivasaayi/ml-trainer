@@ -1,6 +1,7 @@
 import json
 import os
 import shutil
+import random
 
 file_content = open("files.json", "r")
 all_files_str = file_content.read()
@@ -15,13 +16,19 @@ for key in all_files:
 
     print(key, len(files), div)
 
-    for i in range(0,div):
-        print(i)
+    random_numbers = []
+
+    for i in range(0, div):
+        random_no = random.randrange(0, len(files))
+        random_numbers.append(random_no)
+        print(random_no)
+
+    for i in random_numbers:
         source_file_name = files[i]
         if(not os.path.exists(source_file_name)):
             print("Path Not found:", source_file_name)
             continue
-        target_file_name = source_file_name.replace("/training/", "/validation/")
+        target_file_name = source_file_name.replace("/train/", "/validation/")
 
         target_folder_split = target_file_name.split("/")
         target_folder_split.pop()

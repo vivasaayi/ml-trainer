@@ -13,7 +13,7 @@ class CottonDiseaseDataLoader():
                 T.Resize(299),
                 T.CenterCrop(299),
                 T.ToTensor(),
-                T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+                # T.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
             ]
         )
         return transforms
@@ -41,7 +41,7 @@ class CottonDiseaseDataLoader():
             transform = self.get_empty_transform()
 
         test_data = datasets.ImageFolder(self.base_path + '/validation', transform=transform)
-        test_dataloader = DataLoader(test_data, batch_size=batch_size, shuffle=True)
+        test_dataloader = DataLoader(test_data, shuffle=True)
         return test_dataloader
 
     def preprocess(self, transformed_train_path, transformed_test_path):

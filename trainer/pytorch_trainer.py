@@ -13,6 +13,13 @@ from mltrainermodels.pytorch.torch_models.mobilenet import MobileNetV3Large, Mob
 
 from mltrainermodels.pytorch.torch_models.regnet import Regnet_x_8gf, Regnet_x_16gf, Regnet_y_8gf, Regnet_y_16gf
 
+from sklearn.metrics import confusion_matrix
+import pandas as pd
+import matplotlib.pyplot as plt
+import numpy as np
+import seaborn as sn
+
+
 from torchinfo import summary
 import torch
 from torch.utils.data import DataLoader
@@ -62,6 +69,8 @@ models_dictionary = {
     "torch_models.regnet_y_16gf": Regnet_y_16gf
 }
 
+index = 0;
+
 
 class PyTorchMLTrainer():
     def __init__(self, model_name):
@@ -100,6 +109,12 @@ class PyTorchMLTrainer():
         self.loss_fn = nn.CrossEntropyLoss()
         self.optimizer = torch.optim.SGD(self.model.parameters(), lr=self.learning_rate)
 
+    def appendl_line(self, data):
+        print(data)
+        file1 = open("result.txt", "a")  # append mode
+        file1.write(data)
+        file1.close()
+
     def train_loop(self):
         size = len(self.train_dataloader.dataset)
         for batch, (X, y) in enumerate(self.train_dataloader):
@@ -121,11 +136,15 @@ class PyTorchMLTrainer():
 
             if batch % 100 == 0:
                 loss, current = loss.item(), batch * len(X)
-                print(f"loss: {loss:>7f}  [{current:>5d}/{size:>5d}]")
+                self.appendl_line(f"\n\nloss: {loss:>7f}  [{current:>5d}/{size:>5d}]\n\n")
 
     def test_loop(self):
+        global index
         size = len(self.test_dataloader.dataset)
         test_loss, correct = 0, 0
+
+        y_pred = []
+        y_true = []
 
         with torch.no_grad():
             for X, y in self.test_dataloader:
@@ -133,6 +152,23 @@ class PyTorchMLTrainer():
                     X = X.cuda()
                     y = y.cuda()
                 pred = self.model(X)
+
+                # print(pred)
+                if self.use_logits_for_loss_function:
+                    output = (torch.max(torch.exp(pred.logits), 1)[1]).data.cpu().numpy()
+                else:
+                    output = (torch.max(torch.exp(pred), 1)[1]).data.cpu().numpy()
+
+                labels = y.data.cpu().numpy()
+
+                # print("Predicted:", output)
+                # print("Actual:", labels)
+
+                y_pred.extend(output)
+                y_true.extend(labels)
+
+                # print("Actual:", y_true)
+                # print("Predicted:", y_pred)
 
                 if self.use_logits_for_loss_function:
                     test_loss += self.loss_fn(pred.logits, y).item()
@@ -143,15 +179,34 @@ class PyTorchMLTrainer():
 
         test_loss /= size
         correct /= size
-        print(f"Test Error: \n Accuracy: {(100 * correct):>0.1f}%, Avg loss: {test_loss:>8f} \n")
+
+        self.appendl_line(f"\n\nTest Error: \n Accuracy: {(100 * correct):>0.1f}%, Avg loss: {test_loss:>8f} \n\n")
+
+        classes = self.train_dataloader.dataset.classes
+
+        # Build confusion matrix
+        cf_matrix = confusion_matrix(y_true, y_pred)
+
+        df_cm = pd.DataFrame(cf_matrix / np.sum(cf_matrix) * 100, index=[i for i in classes],
+                             columns=[i for i in classes])
+        plt.figure(figsize=(12, 7))
+        sn.heatmap(df_cm, annot=True)
+        plt.savefig("trainingresults/" + str(index) + '_output.png')
+        index = index + 1
+        plt.show()
+        plt.close()
+
+        self.appendl_line(df_cm.to_string() + "\n\n")
+
+
 
     def train(self):
         print(f"Training ML Model {self.model_name}")
         for epoch in range(0, self.epochs):
-            print(f"Starting epoch {epoch}")
+            self.appendl_line(f"Starting epoch {epoch}")
             self.train_loop()
             self.test_loop()
-            print(f"Completed epoch {epoch}")
+            self.appendl_line(f"Completed epoch {epoch}")
 
     def save_model(self):
         print("Saving Model")

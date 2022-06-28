@@ -30,7 +30,7 @@ def prepare_dataset():
     print("Preparing DataSet")
 
     base_path = "/users/rajanp/Downloads/rice/RiceDiseaseDataSet"
-    op_train_path = "/users/rajanp/Downloads/rice-processed/train"
+    op_train_path = "/users/rajanp/Downloads/rice-processecleard/train"
     op_test_path = "/users/rajanp/Downloads/rice-processed/validation"
 
     dataloader = RiceHealthDataLoader(base_path)

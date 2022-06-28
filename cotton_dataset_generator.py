@@ -3,7 +3,9 @@ import psycopg2
 import boto3
 import json
 import os
+import sys
 import numpy as np
+import traceback
 
 def get_aws_secret_value():
     client = boto3.client('secretsmanager', region_name="us-west-2")
@@ -35,10 +37,14 @@ def get_images_list():
 
     images_list = []
     for row in data:
+        s3Path = row[2]
+        if ".mp4" in s3Path:
+            continue
+
         images_list.append({
             "imageId": row[0],
             "dateTime": row[1],
-            "s3Path": row[2],
+            "s3Path": s3Path,
             "localFilePath": row[3],
             "imageIndex": row[4],
         })
@@ -70,6 +76,14 @@ images_by_label = {
 
 }
 
+label_remap = {
+    "arugampulweed": "weed",
+    "damagedboll": "boll",
+    "drygrassweed": "dryweed",
+    "dryriceplantroot": "dryweed",
+    "gressweed": "weed"
+}
+
 for image_info in images_list:
     try:
         full_path = "/Users/rajanp/datasets_local/" + image_info["s3Path"]
@@ -88,6 +102,11 @@ for image_info in images_list:
             if len(label["points"]) < 2:
                 print("No Labels found for " + image_info["imageId"])
                 continue
+
+            print(label_name)
+            if label_name in label_remap:
+                label_name=label_remap[label_name]
+
             crop_path = extracted_dataset_path + label_name + "/"
             crop_file_name = crop_path + str(image_info["imageIndex"])  + "-" + str(image_info["imageId"])  + "-" + str(label["id"])  + "-" + image_info["s3Path"].replace("/", "-")
             print(crop_file_name)
@@ -99,7 +118,17 @@ for image_info in images_list:
             width = label["points"][1]["x"]
             height = label["points"][1]["y"]
 
-            if(x_offset < 0):
+            if (width < x_offset):
+                tmp = x_offset
+                width = x_offset
+                x_offset = tmp
+
+            if (height < y_offset):
+                tmp = y_offset
+                height = y_offset
+                y_offset = tmp
+
+            if (x_offset < 0):
                 x_offset = 0
 
             if (y_offset < 0):
@@ -111,20 +140,31 @@ for image_info in images_list:
             if width > image.width:
                 width = image.width
 
+            if x_offset == width:
+                print("WWWWWWWWWIIIiiIIIIIIIIIIRRRRRR")
+                continue
+
             box = (x_offset, y_offset, width, height)
+            print(box, image)
+
             crop = image.crop(box)
             try:
                 crop.save(crop_file_name, "jpeg", quality=100)
-            except(Exception):
+            except Exception as e:
+                print(e)
                 print("Error - ", image_info["imageId"])
+                sys.exit(0)
                 pass
 
             if label_name not in images_by_label:
                 images_by_label[label_name] = []
 
             images_by_label[label_name].append(crop_file_name)
-    except(Exception):
+    except  Exception as ex2:
+        print(ex2)
+        print(traceback.format_exc())
         print("ERRRRRR:", image_info["s3Path"])
+        # sys.exit(0)
 
 
 f = open("files.json", "w")
