@@ -2,12 +2,28 @@ import json
 import os
 import shutil
 import random
+import sys
 
-file_content = open("files.json", "r")
-all_files_str = file_content.read()
+base_path = "/Users/rajanp/extracted_datasets_local-processed/train"
+dirs = os.listdir(base_path)
+print(dirs)
 
-all_files = json.loads(all_files_str)
+all_files = {}
 
+for dir in dirs:
+    class_dir = os.path.join(base_path, dir)
+    if not os.path.isdir(class_dir):
+        continue
+
+    all_files[dir] = []
+
+    os.makedirs(class_dir, exist_ok=True)
+
+    for file in os.listdir(class_dir):
+        full_path = os.path.join(class_dir, file)
+        all_files[dir].append((full_path))
+
+print(json.dumps(all_files, indent=2))
 
 for key in all_files:
     files = all_files[key]

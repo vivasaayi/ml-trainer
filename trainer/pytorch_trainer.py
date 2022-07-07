@@ -1,3 +1,5 @@
+import os
+
 from mltrainermodels.pytorch.simple_convnet import SimpleConvnet
 from mltrainermodels.pytorch.cnn import CNN
 from mltrainermodels.pytorch.torch_models.resnet import Resnet18, Resnet34, Resnet50, Resnet101, Resnet152
@@ -18,6 +20,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sn
+import uuid
+from datetime import datetime
 
 
 from torchinfo import summary
@@ -90,6 +94,22 @@ class PyTorchMLTrainer():
         if (self.model_name == "torch_models.googlenet" or self.model_name == "torch_models.inceptionv3"):
             self.use_logits_for_loss_function = True
 
+        self.test_losses = []
+        self.test_accuracy = []
+
+        self.train_losses = []
+        self.train_accuracy = []
+        operation_start_time = datetime.now()
+        time_now = str(operation_start_time)
+        self.results_folder = model_name + "_" + time_now
+        os.makedirs(self.results_folder)
+
+        results_file = open(self.results_folder + "/result.txt", "w")
+        results_file.write(self.model_name + "\n "+ time_now +" \n___________________")
+        results_file.close()
+
+        self.epochs_completed = []
+
         # ToDO: FIX ME
         summary(self.model)
 
@@ -111,35 +131,56 @@ class PyTorchMLTrainer():
 
     def appendl_line(self, data):
         print(data)
-        file1 = open("result.txt", "a")  # append mode
+        file1 = open(self.results_folder + "/result.txt", "a")  # append mode
         file1.write(data)
         file1.close()
 
     def train_loop(self):
         size = len(self.train_dataloader.dataset)
-        for batch, (X, y) in enumerate(self.train_dataloader):
+        running_loss = 0.0
+        count = 0
+        correct = 0
+        start_time = datetime.now()
+        for batch, (inputs, labels) in enumerate(self.train_dataloader):
+            count = count + 1
             # Compute prediction and loss
             if torch.cuda.is_available():
-                X = X.cuda()
-                y = y.cuda()
-            pred = self.model(X)
+                inputs = inputs.cuda()
+                labels = labels.cuda()
+            pred = self.model(inputs)
 
             if self.use_logits_for_loss_function:
-                loss = self.loss_fn(pred.logits, y)
+                loss = self.loss_fn(pred.logits, labels)
+                correct += (pred.logits.argmax(1) == labels).type(torch.float).sum().item()
             else:
-                loss = self.loss_fn(pred, y)
+                loss = self.loss_fn(pred, labels)
+                correct += (pred.argmax(1) == labels).type(torch.float).sum().item()
 
             # Backpropagation
             self.optimizer.zero_grad()
             loss.backward()
             self.optimizer.step()
 
-            if batch % 100 == 0:
-                loss, current = loss.item(), batch * len(X)
-                self.appendl_line(f"\n\nloss: {loss:>7f}  [{current:>5d}/{size:>5d}]\n\n")
+            running_loss += loss.item()
+
+            loss, current = loss.item(), batch * len(inputs)
+            if batch % 100 == 0 or count == size or count == size - 1:
+                self.appendl_line(f"loss: {loss:>7f}   train_accuracy: {correct:>7f}  [{current:>5d}]\n")
+
+        train_accuracy = correct / size
+        self.appendl_line(f"\n\nloss: {running_loss/size:>7f}  train_accuracy: {train_accuracy:>7f} [{current:>5d}/{size:>5d}]\n\n")
+
+        self.train_accuracy.append(train_accuracy)
+        self.train_losses.append(running_loss/count)
+        end_time = datetime.now()
+
+        duration = (end_time - start_time).seconds
+        self.appendl_line("Test Loop Duration:", duration)
+
 
     def test_loop(self):
         global index
+        start_time = datetime.now()
         size = len(self.test_dataloader.dataset)
         test_loss, correct = 0, 0
 
@@ -182,6 +223,9 @@ class PyTorchMLTrainer():
 
         self.appendl_line(f"\n\nTest Error: \n Accuracy: {(100 * correct):>0.1f}%, Avg loss: {test_loss:>8f} \n\n")
 
+        self.test_losses.append(test_loss)
+        self.test_accuracy.append(correct)
+
         classes = self.train_dataloader.dataset.classes
 
         # Build confusion matrix
@@ -191,22 +235,59 @@ class PyTorchMLTrainer():
                              columns=[i for i in classes])
         plt.figure(figsize=(12, 7))
         sn.heatmap(df_cm, annot=True)
-        plt.savefig("trainingresults/" + str(index) + '_output.png')
+        plt.savefig(self.results_folder + "/" + str(index) + '_output.png')
         index = index + 1
         plt.show()
         plt.close()
 
         self.appendl_line(df_cm.to_string() + "\n\n")
+        end_time = datetime.now()
 
+        duration = (end_time - start_time).seconds
+        self.appendl_line("Test Loop Duration:", duration)
 
+    def plot_graph(self, epoch):
+        # print(self.epochs_completed)
+        # print(self.train_losses)
+        # print(self.test_losses)
+        # print(self.train_accuracy)
+        # print(self.test_accuracy)
+
+        plt.figure(figsize=(12, 7))
+        lineObjects = plt.plot(self.epochs_completed, self.train_losses, 'r', self.epochs_completed, self.test_losses, 'b')
+        plt.legend(iter(lineObjects), ('train_losses', 'test_losses'))
+        plt.grid(True)
+        plt.savefig(self.results_folder + "/a_loss_" + str(epoch) + '.png', bbox_inches='tight')
+        plt.show()
+        plt.close()
+
+        plt.figure(figsize=(12, 7))
+        plt.plot(self.epochs_completed, self.train_accuracy, 'r', self.test_accuracy, 'b')
+        plt.legend(iter(lineObjects), ('train_accuracy', 'test_accuracy'))
+        plt.grid(True)
+        plt.savefig(self.results_folder + "/a_acc_" + str(epoch) + '.png', bbox_inches='tight')
+        plt.show()
+        plt.close()
 
     def train(self):
         print(f"Training ML Model {self.model_name}")
         for epoch in range(0, self.epochs):
             self.appendl_line(f"Starting epoch {epoch}")
+            self.epochs_completed.append(epoch)
             self.train_loop()
             self.test_loop()
+
+            # if(epoch % 6 == 0):
+            self.plot_graph(epoch)
+
             self.appendl_line(f"Completed epoch {epoch}")
 
+        self.plot_graph(epoch)
+
+
     def save_model(self):
+        end_time = datetime.now()
+        duration = (end_time - self.operation_start_time).seconds
+        self.appendl_line("Test Loop Duration:", duration)
+
         print("Saving Model")
