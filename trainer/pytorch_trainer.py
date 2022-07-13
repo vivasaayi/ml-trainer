@@ -23,7 +23,6 @@ import seaborn as sn
 import uuid
 from datetime import datetime
 
-
 from torchinfo import summary
 import torch
 from torch.utils.data import DataLoader
@@ -81,6 +80,15 @@ class PyTorchMLTrainer():
         self.model_name = model_name
         print(f"Initializing Keras ML Trainer {self.model_name}")
 
+        self.operation_start_time = datetime.now()
+        time_now = str(self.operation_start_time)
+        self.results_folder = model_name + "_" + time_now
+        os.makedirs(self.results_folder)
+
+        results_file = open(self.results_folder + "/result.txt", "w")
+        results_file.write(self.model_name + "\n " + time_now + " \n___________________")
+        results_file.close()
+
         self.model = models_dictionary[model_name]()
         self.model.initialize()
 
@@ -88,7 +96,7 @@ class PyTorchMLTrainer():
             print("Moving Model to CUDA")
             self.model.cuda()
 
-        print(f"Model Initialized {self.model_name}")
+        self.appendl_line(f"Model Initialized {self.model_name}")
 
         self.use_logits_for_loss_function = False
         if (self.model_name == "torch_models.googlenet" or self.model_name == "torch_models.inceptionv3"):
@@ -96,22 +104,17 @@ class PyTorchMLTrainer():
 
         self.test_losses = []
         self.test_accuracy = []
+        self.test_accuracy_count = []
 
         self.train_losses = []
         self.train_accuracy = []
-        operation_start_time = datetime.now()
-        time_now = str(operation_start_time)
-        self.results_folder = model_name + "_" + time_now
-        os.makedirs(self.results_folder)
-
-        results_file = open(self.results_folder + "/result.txt", "w")
-        results_file.write(self.model_name + "\n "+ time_now +" \n___________________")
-        results_file.close()
+        self.train_accuracy_count = []
 
         self.epochs_completed = []
 
         # ToDO: FIX ME
-        summary(self.model)
+        model_summary = summary(self.model)
+        self.appendl_line(str(model_summary))
 
     def initialize_with_dataset(self, training_data, test_data, batch_size):
         training_data_loader = DataLoader(training_data, batch_size=batch_size, shuffle=True)
@@ -168,15 +171,16 @@ class PyTorchMLTrainer():
                 self.appendl_line(f"loss: {loss:>7f}   train_accuracy: {correct:>7f}  [{current:>5d}]\n")
 
         train_accuracy = correct / size
-        self.appendl_line(f"\n\nloss: {running_loss/size:>7f}  train_accuracy: {train_accuracy:>7f} [{current:>5d}/{size:>5d}]\n\n")
+        self.appendl_line(
+            f"\n\nloss: {running_loss / size:>7f}  train_accuracy: {train_accuracy:>7f} [{current:>5d}/{size:>5d}]\n\n")
 
         self.train_accuracy.append(train_accuracy)
-        self.train_losses.append(running_loss/count)
+        self.train_accuracy_count = correct
+        self.train_losses.append(running_loss / count)
         end_time = datetime.now()
 
         duration = (end_time - start_time).seconds
-        self.appendl_line("Test Loop Duration:", duration)
-
+        self.appendl_line(f"\nTraining Loop Duration: {duration} seconds\n")
 
     def test_loop(self):
         global index
@@ -218,6 +222,8 @@ class PyTorchMLTrainer():
                     test_loss += self.loss_fn(pred, y).item()
                     correct += (pred.argmax(1) == y).type(torch.float).sum().item()
 
+        self.test_accuracy_count = correct
+
         test_loss /= size
         correct /= size
 
@@ -234,17 +240,31 @@ class PyTorchMLTrainer():
         df_cm = pd.DataFrame(cf_matrix / np.sum(cf_matrix) * 100, index=[i for i in classes],
                              columns=[i for i in classes])
         plt.figure(figsize=(12, 7))
-        sn.heatmap(df_cm, annot=True)
-        plt.savefig(self.results_folder + "/" + str(index) + '_output.png')
-        index = index + 1
+        sn.heatmap(df_cm, annot=True, fmt='.3g')
+        plt.savefig(self.results_folder + "/cm_" + str(index) + '_percent_output.png', bbox_inches='tight')
         plt.show()
         plt.close()
 
         self.appendl_line(df_cm.to_string() + "\n\n")
         end_time = datetime.now()
 
+        cf_matrix_count = confusion_matrix(y_true, y_pred)
+
+        df_cm = pd.DataFrame(cf_matrix_count, index=[i for i in classes],
+                             columns=[i for i in classes])
+        plt.figure(figsize=(12, 7))
+        sn.heatmap(df_cm, annot=True, fmt='.0f')
+        plt.savefig(self.results_folder + "/cm_" + str(index) + '_count_output.png', bbox_inches='tight')
+        plt.show()
+        plt.close()
+
+        index = index + 1
+
+        self.appendl_line(df_cm.to_string() + "\n\n")
+        end_time = datetime.now()
+
         duration = (end_time - start_time).seconds
-        self.appendl_line("Test Loop Duration:", duration)
+        self.appendl_line(f"\nTest Loop Duration: {duration} seconds\n")
 
     def plot_graph(self, epoch):
         # print(self.epochs_completed)
@@ -254,7 +274,8 @@ class PyTorchMLTrainer():
         # print(self.test_accuracy)
 
         plt.figure(figsize=(12, 7))
-        lineObjects = plt.plot(self.epochs_completed, self.train_losses, 'r', self.epochs_completed, self.test_losses, 'b')
+        lineObjects = plt.plot(self.epochs_completed, self.train_losses, 'r', self.epochs_completed, self.test_losses,
+                               'b')
         plt.legend(iter(lineObjects), ('train_losses', 'test_losses'))
         plt.grid(True)
         plt.savefig(self.results_folder + "/a_loss_" + str(epoch) + '.png', bbox_inches='tight')
@@ -284,10 +305,15 @@ class PyTorchMLTrainer():
 
         self.plot_graph(epoch)
 
+        end_time = datetime.now()
+        duration = (end_time - self.operation_start_time).seconds
+        self.appendl_line(f"\nTotal: {duration} minutes\n")
+        self.appendl_line(f"\nEnd_time: {end_time}")
 
     def save_model(self):
         end_time = datetime.now()
         duration = (end_time - self.operation_start_time).seconds
-        self.appendl_line("Test Loop Duration:", duration)
+        self.appendl_line(f"\nTotal: {duration} minutes\n")
+        self.appendl_line(f"\nEnd_time: {end_time}")
 
         print("Saving Model")

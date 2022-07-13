@@ -63,5 +63,7 @@ cd ~/SageMaker
 rm -rf extracted_datasets_local-processed
 unzip extracted_datasets_local-processed.zip
 
-python cli.py mltrainer train-torch-net  --model-name=torch_models.inceptionv3 --data-loader-name COTTON_PLANTS --dataset-path=/home/ec2-user/SageMaker/extracted_datasets_local-processed
+!pip install -r requirements.txt
+!pip install torch torchvision sklearn tensorflow torchinfo
+!python cli.py mltrainer train-torch-net  --model-name=torch_models.inceptionv3 --data-loader-name COTTON_PLANTS --dataset-path=/home/ec2-user/SageMaker/extracted_datasets_local-processed
 ```
